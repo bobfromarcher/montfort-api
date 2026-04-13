@@ -21,14 +21,18 @@ const STRIPE_PRICES = {
 const USE_PG = !!process.env.DATABASE_URL;
 let store = null;
 let db = { users: {}, agents: {}, dispatches: {}, apikeys: {} };
+let pgError = null;
 
 if (USE_PG) {
   try {
     store = require('./store');
-    console.log('PostgreSQL storage enabled');
+    console.log('PostgreSQL storage enabled, DATABASE_URL present');
   } catch (err) {
+    pgError = err.message;
     console.error('Failed to load PG store, falling back to in-memory:', err.message);
   }
+} else {
+  console.log('No DATABASE_URL found, using in-memory storage');
 }
 
 function generateApiKey() {
@@ -300,7 +304,14 @@ app.post('/api/v1/billing/checkout', authMiddleware, async (req, res) => {
 });
 
 app.get('/api/v1/health', (req, res) => {
-  res.json({ status: 'operational', version: '1.0.0', storage: store ? 'postgresql' : 'memory', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'operational',
+    version: '1.0.0',
+    storage: store ? 'postgresql' : 'memory',
+    databaseUrlSet: !!process.env.DATABASE_URL,
+    pgModuleError: pgError,
+    timestamp: new Date().toISOString()
+  });
 });
 
 const PORT = process.env.PORT || 3100;
