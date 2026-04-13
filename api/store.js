@@ -31,11 +31,11 @@ async function createUser({ id, email, company, passwordHash, passwordSalt, plan
 }
 
 async function updateUserPlan(userId, plan, stripeCustomerId) {
-  const parts = ['plan = $2'];
-  const vals = [userId, plan];
-  if (stripeCustomerId) { parts.push('stripe_customer_id = $' + (vals.length + 1)); vals.push(stripeCustomerId); }
-  vals.push(userId);
-  await query(`UPDATE users SET ${parts.join(', ')} WHERE id = $1`, [userId, plan, stripeCustomerId].filter(Boolean));
+  if (stripeCustomerId) {
+    await query('UPDATE users SET plan = $1, stripe_customer_id = $2 WHERE id = $3', [plan, stripeCustomerId, userId]);
+  } else {
+    await query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+  }
 }
 
 async function createApiKey(keyHash, userId, plan) {
@@ -95,8 +95,13 @@ async function incrementMonthlyUsage(userId, month) {
   );
 }
 
+async function getUserByStripeCustomer(customerId) {
+  const r = await query('SELECT * FROM users WHERE stripe_customer_id = $1', [customerId]);
+  return r.rows[0] || null;
+}
+
 module.exports = {
-  query, getUserByEmail, getUserById, createUser, updateUserPlan,
+  query, getUserByEmail, getUserById, getUserByStripeCustomer, createUser, updateUserPlan,
   createApiKey, getApiKeyByKey, revokeApiKeysForUser,
   createAgent, getAgentsByUser, countAgentsByUser,
   createDispatch, getMonthlyUsage, incrementMonthlyUsage

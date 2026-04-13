@@ -290,6 +290,7 @@ app.post('/api/v1/billing/checkout', authMiddleware, async (req, res) => {
       payment_method_types: ['card'],
       line_items: [{ price: STRIPE_PRICES[plan], quantity: 1 }],
       mode: 'subscription',
+      metadata: { userId: user.id, plan, priceId: STRIPE_PRICES[plan] },
       success_url: process.env.SITE_URL + '/billing?success=true',
       cancel_url: process.env.SITE_URL + '/billing?canceled=true'
     });
@@ -297,6 +298,98 @@ app.post('/api/v1/billing/checkout', authMiddleware, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.post('/api/v1/billing/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) return res.status(400).send('Missing signature or webhook secret');
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const customerId = session.customer;
+        const priceId = session.line_items?.data?.[0]?.price?.id || session.metadata?.priceId;
+        let plan = 'starter';
+        for (const [p, pid] of Object.entries(STRIPE_PRICES)) {
+          if (pid === priceId) { plan = p; break; }
+        }
+
+        if (store) {
+          const user = await store.getUserByStripeCustomer(customerId);
+          if (user) {
+            await store.updateUserPlan(user.id, plan, customerId);
+            await store.revokeApiKeysForUser(user.id);
+          }
+        } else {
+          const user = Object.values(db.users).find(u => u.stripeCustomerId === customerId || u.stripe_customer_id === customerId);
+          if (user) {
+            user.plan = plan;
+            if (!user.stripeCustomerId) user.stripeCustomerId = customerId;
+            db.apikeys = Object.fromEntries(
+              Object.entries(db.apikeys).map(([k, v]) => v.id === user.id ? [k, { ...v, plan }] : [k, v])
+            );
+          }
+        }
+        console.log(`Checkout completed: customer=${customerId}, plan=${plan}`);
+        break;
+      }
+      case 'customer.subscription.updated': {
+        const sub = event.data.object;
+        const customerId = sub.customer;
+        const priceId = sub.items?.data?.[0]?.price?.id;
+        let plan = 'starter';
+        for (const [p, pid] of Object.entries(STRIPE_PRICES)) {
+          if (pid === priceId) { plan = p; break; }
+
+        }
+        if (store) {
+          const user = await store.getUserByStripeCustomer(customerId);
+          if (user) await store.updateUserPlan(user.id, plan, customerId);
+        } else {
+          const user = Object.values(db.users).find(u => u.stripeCustomerId === customerId);
+          if (user) {
+            user.plan = plan;
+            db.apikeys = Object.fromEntries(
+              Object.entries(db.apikeys).map(([k, v]) => v.id === user.id ? [k, { ...v, plan }] : [k, v])
+            );
+          }
+        }
+        console.log(`Subscription updated: customer=${customerId}, plan=${plan}`);
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object;
+        const customerId = sub.customer;
+        if (store) {
+          const user = await store.getUserByStripeCustomer(customerId);
+          if (user) await store.updateUserPlan(user.id, 'starter', customerId);
+        } else {
+          const user = Object.values(db.users).find(u => u.stripeCustomerId === customerId);
+          if (user) {
+            user.plan = 'starter';
+            db.apikeys = Object.fromEntries(
+              Object.entries(db.apikeys).map(([k, v]) => v.id === user.id ? [k, { ...v, plan: 'starter' }] : [k, v])
+            );
+          }
+        }
+        console.log(`Subscription canceled: customer=${customerId}, downgraded to starter`);
+        break;
+      }
+    }
+  } catch (err) {
+    console.error('Webhook handler error:', err.message);
+    return res.status(500).send('Handler error');
+  }
+
+  res.json({ received: true });
 });
 
 app.get('/api/v1/health', (req, res) => {
