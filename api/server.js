@@ -483,12 +483,44 @@ app.post('/api/v1/llm', authMiddleware, dispatchLimitMiddleware, async (req, res
     return res.status(400).json({ error: 'messages array required' });
   }
 
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey) {
+    try {
+      const fetchMod = (await import('node-fetch')).default;
+      const resp = await fetchMod('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` },
+        body: JSON.stringify({
+          model: model || process.env.LLM_MODEL || 'llama-3.3-70b-versatile',
+          messages,
+          stream: false,
+          max_tokens: 2048
+        }),
+        timeout: 60000
+      });
+      const data = await resp.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      if (!content) return res.status(502).json({ error: 'LLM returned empty', details: data.error?.message });
+
+      const month = new Date().toISOString().slice(0, 7);
+      if (store) {
+        const dispatchId = 'dsp_' + crypto.randomBytes(12).toString('hex');
+        await store.createDispatch({ id: dispatchId, userId: req.user.id, agentId: 'llm-proxy', prompt: messages[messages.length - 1]?.content?.slice(0, 1000) || '', source: 'api', status: 'completed' });
+        await store.incrementMonthlyUsage(req.user.id, month);
+      }
+
+      return res.json({ content, model: model || 'llama-3.3-70b-versatile', timestamp: new Date().toISOString() });
+    } catch (err) {
+      return res.status(502).json({ error: 'Groq LLM unavailable', details: err.message });
+    }
+  }
+
   const llmEndpoint = process.env.LLM_ENDPOINT || 'http://127.0.0.1:11434/v1/chat/completions';
   const llmModel = model || process.env.LLM_MODEL || 'qwen3:0.6b';
 
   try {
-    const fetch = (await import('node-fetch')).default;
-    const resp = await fetch(llmEndpoint, {
+    const fetchMod = (await import('node-fetch')).default;
+    const resp = await fetchMod(llmEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: llmModel, messages, stream: false }),
