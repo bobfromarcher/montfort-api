@@ -1,0 +1,197 @@
+═════════════════════════════════════════════════════════════════════════
+                    MONTFORT - BUSINESS OPERATIONS PLAYBOOK
+                    DE MONTFORT LLC | Florida
+═════════════════════════════════════════════════════════════════════════
+
+═══ I. CORPORATE SETUP ────────────────────────────────────────────────────
+
+□ EIN APPLICATION (FREE - IRS)
+  → Go to: https://www.irs.gov/businesses/small-businesses-self-employed/apply-for-an-employer-identification-number-ein-online
+  → Select "Limited Liability Company (LLC)"
+  → State: Florida
+  → Type: Multi-member or Single-member (your call)
+  → No employees needed on application
+  → EIN issued immediately online
+  → Use EIN for: bank account, Stripe, tax filings
+
+□ BANK ACCOUNT UPGRADE
+  → You have a business account. Ensure it's under DE MONTFORT LLC / EIN
+  → Recommended fintech for startups (no minimums, no fees):
+    - Mercury (mercury.com) - tech-friendly, free ACH/wires
+    - Relay (relayfi.com) - up to 20 checking accounts, no fees
+    - Both integrate with Stripe natively
+
+□ DOMAIN REGISTRATION ($10-15/year)
+  → montfort.com is likely taken. Alternatives:
+    - montfort.ai ($40-60/yr) - signals AI company
+    - montfort.dev ($12/yr) - signals developer tool
+    - getmontfort.com ($12/yr) - always available
+    - montfort.io ($40/yr) - startup standard
+  → Registrar: Cloudflare (at-cost pricing, no markup)
+  → Point DNS to Vercel or Cloudflare Pages
+
+□ PROFESSIONAL EMAIL
+  → Google Workspace: $6/mo per user (you@montfort.ai)
+  → OR Zoho Mail: $1/mo per user (cheaper)
+  → Set up: legal@, support@, sales@, billing@
+
+═══ II. REVENUE INFRASTRUCTURE ──────────────────────────────────────────
+
+□ STRIPE SETUP (FREE TO START)
+  → Register: https://dashboard.stripe.com/register
+  → Business name: DE MONTFORT LLC
+  → EIN required for payouts
+  → Create products/prices:
+    - Professional: $49/mo recurring subscription
+    - Enterprise: contact sales (no Stripe product needed)
+    - Dispatch overage: $0.001 per unit (metered billing)
+  → Enable: Card, ACH, Wire Transfer
+  → Payout schedule: Daily (7-day rolling)
+
+□ BILLING MODEL
+  Starter:    $0/mo    | 1,000 dispatches | 3 agents    | Community
+  Professional: $49/mo | 50,000 dispatches | Unlimited    | Email support
+  Enterprise:  Custom  | Unlimited          | Unlimited    | Dedicated engineer
+
+  Overage billing: $0.001/dispatch beyond quota
+  Annual prepay: 2 months free (10 for 12)
+
+  REVENUE PROJECTIONS (conservative):
+  Month 1-3:   100 free users, 5 paid          = $245/mo
+  Month 4-6:   500 free users, 25 paid          = $1,225/mo
+  Month 7-9:   2,000 free users, 80 paid        = $3,920/mo
+  Month 10-12: 5,000 free users, 200 paid       = $9,800/mo
+  + 2 enterprise @ $50K/yr avg                   = $8,333/mo
+  Year 1 run rate target:                        = $150K-250K
+
+═══ III. PRODUCT DISTRIBUTION ───────────────────────────────────────────
+
+□ DEVELOPER CHANNEL ($0)
+  → GitHub: github.com/montforthq/agent-hq (open source core)
+  → README with: Quick Start, Architecture, Contributing
+  → Releases with pre-built binaries (electron-builder)
+  → npm package: @montforthq/agent-cli (headless mode)
+
+□ DESKTOP DISTRIBUTION
+  → Windows: .exe installer via GitHub Releases + winget
+  → macOS: .dmg via GitHub Releases + brew cask
+  → Linux: .AppImage via GitHub Releases + snap
+  → Auto-update via electron-updater
+
+□ CLOUD SaaS ($0 TO START)
+  → Host API on: Railway ($5/mo) or Fly.io ($3/mo free tier)
+  → Host site on: Vercel (free) or Cloudflare Pages (free)
+  → Database: Supabase free tier (500MB) or Railway Postgres ($5/mo)
+  → All bootstrappable under $10/mo total
+
+□ DOCKER (enterprise)
+  → montfort/agent-hq:latest on Docker Hub
+  → docker-compose.yml for on-prem deploy
+  → Helm chart for Kubernetes (enterprise feature)
+
+═══ IV. GO-TO-MARKET ──────────────────────────────────────────────────
+
+□ CONTENT ENGINE ($0)
+  → Blog posts: "Why AI needs infrastructure, not more chatbots"
+  → Dev.to / Hashnode cross-posting
+  → YouTube: 5-min demo video, "Deploy your first agent in 60 seconds"
+  → Hacker News: Launch post with technical depth
+
+□ DEVELOPER ADOPTION ($0)
+  → Product Hunt launch
+  → Reddit: r/LocalLLaMA, r/SideProject, r/selfhosted
+  → Discord community server (you already have one)
+  → Dev advocacy: contribute to LangChain/LlamaIndex docs
+
+□ COLD OUTREACH ($0)
+  → LinkedIn Sales Navigator trial (30 days free)
+  → Target: CTOs/VP Eng at companies with 50-500 engineers
+  → Message: "Your team uses AI agents informally. We make it formal, auditable, and billable."
+  → 50 emails/day = 1,000/month = 2-5 enterprise leads
+
+□ PARTNERSHIPS ($0)
+  → Ollama integration (they promote compatible tools)
+  → LM Studio integration
+  → Fireworks AI partner program
+  → Vercel template (deploy Montfort on Vercel in 1 click)
+
+═══ V. LEGAL & COMPLIANCE ─────────────────────────────────────────────
+
+□ DOCUMENTS (DONE)
+  ✓ Terms of Service
+  ✓ Privacy Policy
+  ✓ Data Processing Agreement
+  ✓ Service Level Agreement
+
+□ ANNUAL FILING
+  → Florida LLC annual report: $138.75/year
+  → File by May 1 each year
+  → Sunbiz.org online filing
+
+□ TAX
+  → Single-member LLC: pass-through, Schedule C on personal return
+  → Multi-member LLC: Form 1065 partnership return
+  → Quarterly estimated taxes if expecting $1K+ tax liability
+  → Track ALL business expenses (SaaS, hosting, legal, domains)
+
+□ INSURANCE (optional, $30-60/mo)
+  → General liability: $25-40/mo
+  → Professional liability (E&O): $30-50/mo
+  → Cyber liability: $25-40/mo
+  → Recommended once you have paying enterprise customers
+
+═══ VI. TIMELINE ──────────────────────────────────────────────────────
+
+WEEK 1 (NOW):
+  □ Get EIN online (15 minutes, free)
+  □ Register domain (montfort.ai or getmontfort.com)
+  □ Set up professional email
+  □ Create Stripe account, connect bank
+  □ Push Agent HQ to GitHub as montforthq/agent-hq
+  □ Deploy landing site to Vercel
+
+WEEK 2:
+  □ Set up Stripe products and prices
+  □ Deploy API to Railway/Fly.io
+  □ Record demo video
+  □ Write first blog post
+  □ Launch Product Hunt "coming soon"
+
+WEEK 3:
+  □ Product Hunt launch
+  □ Reddit posts
+  □ Hacker News Show HN
+  □ Cold outreach begins (5/day, ramp to 50/day)
+
+WEEK 4:
+  □ First 100 signups target
+  □ First paid conversion
+  □ Discord community active
+  □ Iterate based on feedback
+
+MONTH 2-3:
+  □ Enterprise outreach (hospitals, defense contractors, financial)
+  □ SOC 2 Type I prep
+  □ On-prem Docker package
+  □ Agent marketplace MVP
+
+MONTH 4-6:
+  □ 500+ free users
+  □ 25+ paid users
+  □ First enterprise pilot
+  □ Annual pricing option
+  □ RBAC + SSO for enterprise
+
+═══ VII. COST STRUCTURE ($0 BOOTSTRAP) ──────────────────────────────
+
+  Domain:          $15/yr
+  Email:           $1-6/mo
+  API hosting:     $0-5/mo (free tiers)
+  Site hosting:    $0 (Vercel free)
+  Database:        $0-5/mo (free tiers)
+  Stripe:          2.9% + $0.30 per transaction (no monthly fee)
+  GitHub:          $0 (public repos free)
+  ──────────────────────────────
+  TOTAL:           ~$10-25/mo until revenue
+
+═════════════════════════════════════════════════════════════════════════

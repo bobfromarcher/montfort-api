@@ -1,0 +1,55 @@
+SERVICE LEVEL AGREEMENT (SLA)
+DE MONTFORT LLC
+Last Updated: April 12, 2026
+
+This SLA applies to Montfort Enterprise plan subscribers only.
+
+1. SERVICE COMMITMENT
+Montfort targets 99.9% uptime for the API, dashboard, and agent dispatch services measured monthly.
+
+2. MEASUREMENT
+Uptime is measured as: (Total Minutes in Month - Downtime Minutes) / Total Minutes in Month × 100
+Excluded from downtime calculation:
+- Scheduled maintenance (communicated 72 hours in advance, max 4 hours/month)
+- Force majeure events
+- Issues caused by customer configuration or third-party LLM provider outages
+- Issues with customer's network or infrastructure
+
+3. SERVICE CREDITS
+If uptime falls below the commitment:
+
+| Uptime Percentage | Service Credit |
+|-------------------|---------------|
+| 99.0% - 99.9%     | 10% of monthly fee |
+| 95.0% - 99.0%     | 25% of monthly fee |
+| Below 95.0%        | 50% of monthly fee |
+
+Service credits are applied to the next billing cycle. Maximum credit is 50% of monthly fee.
+
+4. CLAIMS
+To claim a service credit, customer must submit a claim within 30 days of the incident to support@montfort.com with:
+- Affected service and timeframe
+- Description of impact
+- Supporting evidence (logs, monitoring data)
+
+5. SUPPORT TIERS
+- Critical (service unavailable): 1-hour response, 4-hour resolution target
+- High (major feature impaired): 4-hour response, 8-hour resolution target
+- Medium (minor feature impaired): 8-hour response, 24-hour resolution target
+- Low (cosmetic/informational): 24-hour response, 72-hour resolution target
+
+6. ON-PREMISES
+For on-prem deployments, Montfort provides software updates and remote support. SLA commitments apply to support response times only, not infrastructure uptime (which is customer-managed).
+
+7. MAINTENANCE WINDOWS
+Scheduled maintenance occurs on Sundays 02:00-06:00 UTC. Emergency maintenance may occur with 4 hours' notice.
+
+8. EXCLUSIONS
+This SLA does not cover:
+- Latency of third-party LLM providers
+- Customer-introduced bugs or misconfigurations
+- Data loss due to customer failure to back up
+- Degradation caused by exceeding rate limits or dispatch quotas
+
+9. MODIFICATIONS
+Montfort may modify this SLA with 30 days' written notice.
