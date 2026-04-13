@@ -5,8 +5,66 @@ const crypto = require('crypto');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || '');
 
 const app = express();
-app.use(cors());
+
+const ALLOWED_ORIGINS = [
+  'https://www.gradeafoods.com',
+  'https://gradeafoods.com',
+  'https://api.gradeafoods.com',
+  'http://localhost:3000',
+  'http://localhost:3100'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) callback(null, true);
+    else callback(null, false);
+  },
+  credentials: true
+}));
 app.use(express.json());
+
+const authRateLimiter = new Map();
+const AUTH_RATE_LIMIT_WINDOW = 15 * 60 * 1000;
+const AUTH_RATE_LIMIT_MAX = 10;
+const ipRateLimiter = new Map();
+const IP_RATE_LIMIT_WINDOW = 60 * 1000;
+const IP_RATE_LIMIT_MAX = 60;
+
+function checkAuthRateLimit(email) {
+  const key = email.toLowerCase();
+  const now = Date.now();
+  const record = authRateLimiter.get(key) || { count: 0, windowStart: now };
+  if (now - record.windowStart > AUTH_RATE_LIMIT_WINDOW) {
+    record.count = 1;
+    record.windowStart = now;
+  } else {
+    record.count++;
+  }
+  authRateLimiter.set(key, record);
+  if (record.count > AUTH_RATE_LIMIT_MAX) return false;
+  return true;
+}
+
+function checkIpRateLimit(ip) {
+  const now = Date.now();
+  const record = ipRateLimiter.get(ip) || { count: 0, windowStart: now };
+  if (now - record.windowStart > IP_RATE_LIMIT_WINDOW) {
+    record.count = 1;
+    record.windowStart = now;
+  } else {
+    record.count++;
+  }
+  ipRateLimiter.set(ip, record);
+  return record.count <= IP_RATE_LIMIT_MAX;
+}
+
+app.use((req, res, next) => {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip || 'unknown';
+  if (!checkIpRateLimit(ip)) {
+    return res.status(429).json({ error: 'Rate limit exceeded' });
+  }
+  next();
+});
 
 const PLANS = {
   starter: { name: 'Starter', price: 0, dispatches: 1000, agents: 3 },
@@ -78,6 +136,8 @@ async function dispatchLimitMiddleware(req, res, next) {
 app.post('/api/v1/register', async (req, res) => {
   const { email, password, company } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  if (!checkAuthRateLimit(email + ':register')) return res.status(429).json({ error: 'Too many registration attempts. Try again later.' });
 
   const id = 'usr_' + crypto.randomBytes(12).toString('hex');
   const salt = crypto.randomBytes(16);
@@ -113,6 +173,8 @@ app.post('/api/v1/register', async (req, res) => {
 
 app.post('/api/v1/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  if (!checkAuthRateLimit(email + ':login')) return res.status(429).json({ error: 'Too many login attempts. Try again later.' });
 
   let user;
   if (store) {
@@ -394,6 +456,92 @@ app.post('/api/v1/billing/webhook', express.raw({ type: 'application/json' }), a
 
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'operational', version: '1.0.0', storage: store ? 'postgresql' : 'memory', timestamp: new Date().toISOString() });
+});
+
+app.post('/api/v1/waitlist', async (req, res) => {
+  const { email, company, interest } = req.body;
+  if (!email || typeof email !== 'string') return res.status(400).json({ error: 'Email required' });
+  const sanitizedEmail = email.toLowerCase().trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedEmail)) return res.status(400).json({ error: 'Invalid email' });
+
+  if (store) {
+    try {
+      await store.query(
+        'INSERT INTO waitlist (email, company, interest, created_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT (email) DO NOTHING',
+        [sanitizedEmail, (company || '').slice(0, 255), (interest || '').slice(0, 100)]
+      );
+    } catch (err) {
+      if (!err.message.includes('does not exist')) {
+        console.error('Waitlist error:', err.message);
+      }
+    }
+  }
+
+  res.status(201).json({ success: true, message: 'Added to waitlist. We\'ll be in touch.' });
+});
+
+app.post('/api/v1/password-reset/request', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+
+  let user;
+  if (store) {
+    user = await store.getUserByEmail(email);
+  } else {
+    user = Object.values(db.users).find(u => u.email === email);
+  }
+
+  if (!user) {
+    return res.json({ success: true, message: 'If an account exists with this email, a reset link will be sent.' });
+  }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 3600000).toISOString();
+
+  if (store) {
+    try {
+      await store.query(
+        'INSERT INTO password_resets (user_id, token, expires_at) VALUES ($1, $2, $3)',
+        [user.id, token, expires]
+      );
+    } catch (err) {
+      if (err.message.includes('does not exist')) {
+        console.log('Password resets table not yet migrated, skipping');
+      } else {
+        console.error('Password reset error:', err.message);
+      }
+    }
+  }
+
+  res.json({ success: true, message: 'If an account exists with this email, a reset link will be sent.' });
+});
+
+app.post('/api/v1/password-reset/confirm', async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword || newPassword.length < 8) return res.status(400).json({ error: 'Token and new password (8+ chars) required' });
+
+  if (!store) return res.status(501).json({ error: 'Password reset requires database storage' });
+
+  try {
+    const r = await store.query(
+      'SELECT * FROM password_resets WHERE token = $1 AND expires_at > NOW() AND used_at IS NULL',
+      [token]
+    );
+    const reset = r.rows[0];
+    if (!reset) return res.status(400).json({ error: 'Invalid or expired reset token' });
+
+    const salt = crypto.randomBytes(16);
+    const hash = crypto.pbkdf2Sync(newPassword, salt, 100000, 64, 'sha512').toString('hex');
+
+    await store.query('UPDATE users SET password_hash = $1, password_salt = $2 WHERE id = $3', [hash, salt.toString('hex'), reset.user_id]);
+    await store.query('UPDATE password_resets SET used_at = NOW() WHERE token = $1', [token]);
+    await store.revokeApiKeysForUser(reset.user_id);
+
+    res.json({ success: true, message: 'Password reset successfully. Please log in again.' });
+  } catch (err) {
+    console.error('Password reset confirm error:', err.message);
+    res.status(500).json({ error: 'Password reset failed' });
+  }
 });
 
 const PORT = process.env.PORT || 3100;
