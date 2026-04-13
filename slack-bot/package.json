@@ -1,0 +1,13 @@
+{
+  "name": "montfort-slack",
+  "version": "1.0.0",
+  "description": "Montfort Slack bot — AI agents in your team chat",
+  "main": "slack.js",
+  "scripts": {
+    "start": "node slack.js"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.17.0",
+    "dotenv": "^16.3.1"
+  }
+}

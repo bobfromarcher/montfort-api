@@ -1,0 +1,41 @@
+{
+  "display_information": {
+    "name": "Montfort",
+    "description": "AI agents in your Slack. Deploy agents, talk to them, get work done.",
+    "background_color": "#0a0f0a"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Montfort",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/mf",
+        "description": "Montfort agent commands",
+        "usage_hint": "help | deploy <template> | agents | remember <text>",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "redirect_urls": [],
+    "scopes": {
+      "bot": [
+        "commands",
+        "chat:write",
+        "app_mentions:read",
+        "channels:history",
+        "groups:history"
+      ]
+    }
+  },
+  "settings": {
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false,
+    "interactivity": {
+      "is_modal": false
+    }
+  }
+}
