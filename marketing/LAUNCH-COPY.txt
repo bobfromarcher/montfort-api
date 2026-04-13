@@ -1,0 +1,90 @@
+PRODUCT HUNT LAUNCH COPY
+========================
+
+Tagline: Voice-command your AI agents. Bill every dispatch.
+
+Title: Montfort — Agent Infrastructure for the AI Era
+
+Description:
+Montfort is the operating layer between your LLMs and your business logic. One voice command dispatches work to any agent, chains multiple agents into pipelines, or broadcasts to your entire fleet. Every interaction is tracked, timed, and billable.
+
+What you get:
+- Voice dispatch: Push-to-talk agent commands using local Whisper (works air-gapped)
+- 8 pre-built agent templates: Code, Security, Analytics, Support, Content, PM, Research, DevOps — 1-click deploy
+- Scheduled dispatches: Run agents on autopilot (daily standups, weekly audits, etc.)
+- Agent chains: Route through multiple agents in sequence (architect → coder → reviewer)
+- Discord integration: Agents as team members in your channels
+- Billing infrastructure: Stripe-connected, per-dispatch metering, plan enforcement
+- Audit + analytics: Every dispatch logged, latency tracked, health monitored
+- On-prem capable: Run behind your firewall. Zero data leaves your network.
+
+For developers: Free tier with 3 agents and 1,000 dispatches/month. No credit card.
+For teams: $49/mo Professional — unlimited agents, 50K dispatches, full analytics.
+For enterprise: Custom pricing. Air-gapped deploy. SOC 2 / HIPAA / ITAR ready.
+
+We built this because the AI era needs infrastructure — not just models. Montfort is the middleware that turns AI agents into a manageable, billable, auditable operation.
+
+---
+FIRST COMMENT (maker comment):
+
+Hey everyone! Jeffrey here, CEO of de Montfort. We built Agent HQ because we were tired of chatbot UIs and wanted a real command center for AI agents.
+
+A few things that make us different:
+1. Voice-native: We use local Whisper so it works offline and air-gapped. Critical for defense/healthcare.
+2. Templates: New users can 1-click deploy a Code Agent, Security Scanner, or Data Analyst. Instant value.
+3. Scheduled dispatches: Set it and forget it. Your morning standup agent runs at 9am every weekday.
+4. We bill by dispatch, not by seat. Because that's the metric that actually matters.
+
+Happy to answer any questions. We're a bootstrap company — no VC, no hype, just infrastructure.
+
+---
+GALLERY IMAGES NEEDED:
+1. Voice dispatch button (the big green mic)
+2. Template grid showing 8 agents
+3. Scheduled dispatches panel
+4. Analytics dashboard with P95 latency
+5. Discord integration (agent posting in #hq-status)
+6. Pricing comparison
+
+---
+SOCIAL MEDIA COPY
+=================
+
+TWITTER/X LAUNCH TWEET:
+Introducing Montfort — the operating layer for AI agents.
+
+Voice-command your agents. Chain them into pipelines. Bill every dispatch.
+
+8 pre-built templates. Scheduled dispatches. Full audit trail.
+
+Free tier. No credit card.
+
+The AI era needs infrastructure. We built it.
+
+gradeafoods.com
+
+LINKEDIN POST:
+The AI industry has spent billions on models but nearly nothing on the infrastructure to run them as a business operation.
+
+That's why we built Montfort.
+
+Montfort is an agent command center that lets you:
+- Dispatch work to AI agents with your voice
+- Chain agents into multi-step pipelines
+- Schedule recurring tasks on autopilot
+- Track, time, and bill every dispatch
+
+We've been building as a bootstrap company — no venture funding, just revenue from day one. Our free tier gives developers 3 agents and 1,000 dispatches/month. Professional is $49/mo for unlimited agents.
+
+The future isn't just better models. It's better infrastructure for running them.
+
+Try it free: gradeafoods.com
+
+DISCORD ANNOUNCEMENT:
+@everyone Agent HQ just shipped three massive features:
+
+1. **Agent Templates** — 1-click deploy a Code Agent, Security Scanner, Data Analyst, and 5 more. No config needed.
+2. **Scheduled Dispatches** — Set any agent to run on autopilot. Daily standups, weekly audits, whatever you need.
+3. **Montfort Cloud** — Sign up in the Settings panel to track usage, sync agents, and upgrade to Pro.
+
+We're live at gradeafoods.com. The free tier is real. Go build something.

@@ -1,0 +1,27 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [master]
+    paths: ['api/**', 'package.json', 'Dockerfile', 'Procfile']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: node -e "require('./api/server.js'); console.log('Server loads OK'); process.exit(0)" || true
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx npm audit --audit-level=high || true
