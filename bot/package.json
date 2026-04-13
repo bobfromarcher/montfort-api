@@ -1,0 +1,13 @@
+{
+  "name": "montfort-bot",
+  "version": "1.0.0",
+  "description": "Montfort hosted Discord bot — AI agents in your team chat",
+  "main": "discord.js",
+  "scripts": {
+    "start": "node discord.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1"
+  }
+}

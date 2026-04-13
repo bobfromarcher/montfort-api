@@ -477,6 +477,39 @@ app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'operational', version: '1.0.0', storage: store ? 'postgresql' : 'memory', timestamp: new Date().toISOString() });
 });
 
+app.post('/api/v1/llm', authMiddleware, dispatchLimitMiddleware, async (req, res) => {
+  const { messages, model } = req.body;
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'messages array required' });
+  }
+
+  const llmEndpoint = process.env.LLM_ENDPOINT || 'http://127.0.0.1:11434/v1/chat/completions';
+  const llmModel = model || process.env.LLM_MODEL || 'qwen3:0.6b';
+
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const resp = await fetch(llmEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: llmModel, messages, stream: false }),
+      timeout: 120000
+    });
+    const data = await resp.json();
+    const content = data.choices?.[0]?.message?.content || '';
+
+    const month = new Date().toISOString().slice(0, 7);
+    if (store) {
+      const dispatchId = 'dsp_' + crypto.randomBytes(12).toString('hex');
+      await store.createDispatch({ id: dispatchId, userId: req.user.id, agentId: 'llm-proxy', prompt: messages[messages.length - 1]?.content?.slice(0, 1000) || '', source: 'api', status: 'completed' });
+      await store.incrementMonthlyUsage(req.user.id, month);
+    }
+
+    res.json({ content, model: llmModel, timestamp: new Date().toISOString() });
+  } catch (err) {
+    res.status(502).json({ error: 'LLM unavailable', details: err.message });
+  }
+});
+
 app.post('/api/v1/waitlist', async (req, res) => {
   const { email, company, interest } = req.body;
   if (!email || typeof email !== 'string') return res.status(400).json({ error: 'Email required' });
