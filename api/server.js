@@ -21,7 +21,7 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 const authRateLimiter = new Map();
 const AUTH_RATE_LIMIT_WINDOW = 15 * 60 * 1000;
@@ -29,6 +29,16 @@ const AUTH_RATE_LIMIT_MAX = 10;
 const ipRateLimiter = new Map();
 const IP_RATE_LIMIT_WINDOW = 60 * 1000;
 const IP_RATE_LIMIT_MAX = 60;
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of authRateLimiter) {
+    if (now - v.windowStart > AUTH_RATE_LIMIT_WINDOW) authRateLimiter.delete(k);
+  }
+  for (const [k, v] of ipRateLimiter) {
+    if (now - v.windowStart > IP_RATE_LIMIT_WINDOW) ipRateLimiter.delete(k);
+  }
+}, 5 * 60 * 1000);
 
 function checkAuthRateLimit(email) {
   const key = email.toLowerCase();
@@ -136,8 +146,10 @@ async function dispatchLimitMiddleware(req, res, next) {
 app.post('/api/v1/register', async (req, res) => {
   const { email, password, company } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+  const sanitizedEmail = String(email).toLowerCase().trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedEmail)) return res.status(400).json({ error: 'Invalid email address' });
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
-  if (!checkAuthRateLimit(email + ':register')) return res.status(429).json({ error: 'Too many registration attempts. Try again later.' });
+  if (!checkAuthRateLimit(sanitizedEmail + ':register')) return res.status(429).json({ error: 'Too many registration attempts. Try again later.' });
 
   const id = 'usr_' + crypto.randomBytes(12).toString('hex');
   const salt = crypto.randomBytes(16);
@@ -145,15 +157,15 @@ app.post('/api/v1/register', async (req, res) => {
   const saltHex = salt.toString('hex');
 
   if (store) {
-    const existing = await store.getUserByEmail(email);
+    const existing = await store.getUserByEmail(sanitizedEmail);
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
-    await store.createUser({ id, email, company: company || null, passwordHash: hash, passwordSalt: saltHex, plan: 'starter' });
+    await store.createUser({ id, email: sanitizedEmail, company: company ? String(company).slice(0, 255) : null, passwordHash: hash, passwordSalt: saltHex, plan: 'starter' });
   } else {
-    const existing = Object.values(db.users).find(u => u.email === email);
+    const existing = Object.values(db.users).find(u => u.email === sanitizedEmail);
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
-    db.users[id] = { id, email, company: company || null, passwordHash: hash, passwordSalt: saltHex, plan: 'starter', stripeCustomerId: null, createdAt: new Date().toISOString() };
+    db.users[id] = { id, email: sanitizedEmail, company: company ? String(company).slice(0, 255) : null, passwordHash: hash, passwordSalt: saltHex, plan: 'starter', stripeCustomerId: null, createdAt: new Date().toISOString() };
   }
 
   const apiKey = generateApiKey();
@@ -165,7 +177,7 @@ app.post('/api/v1/register', async (req, res) => {
   }
 
   res.status(201).json({
-    user: { id, email, plan: 'starter', company: company || null },
+    user: { id, email: sanitizedEmail, plan: 'starter', company: company ? String(company).slice(0, 255) : null },
     apiKey,
     message: 'Account created. You have 1,000 dispatches/month on the Starter plan.'
   });
@@ -243,13 +255,16 @@ app.post('/api/v1/dispatch', authMiddleware, dispatchLimitMiddleware, async (req
   const { agentId, prompt, source } = req.body;
 
   if (!agentId || !prompt) return res.status(400).json({ error: 'agentId and prompt required' });
+  const sanitizedAgentId = String(agentId).slice(0, 128);
+  const sanitizedPrompt = String(prompt).slice(0, 10000);
+  const sanitizedSource = String(source || 'api').slice(0, 32);
 
   if (store) {
     const agents = await store.getAgentsByUser(user.id);
-    const agent = agents.find(a => a.id === agentId);
+    const agent = agents.find(a => a.id === sanitizedAgentId);
     if (!agent) return res.status(404).json({ error: 'Agent not found' });
   } else {
-    const agent = db.agents[agentId];
+    const agent = db.agents[sanitizedAgentId];
     if (!agent || agent.userId !== user.id) return res.status(404).json({ error: 'Agent not found' });
   }
 
@@ -257,7 +272,7 @@ app.post('/api/v1/dispatch', authMiddleware, dispatchLimitMiddleware, async (req
   const month = new Date().toISOString().slice(0, 7);
 
   if (store) {
-    await store.createDispatch({ id: dispatchId, userId: user.id, agentId, prompt, source: source || 'api', status: 'accepted' });
+    await store.createDispatch({ id: dispatchId, userId: user.id, agentId: sanitizedAgentId, prompt: sanitizedPrompt, source: sanitizedSource, status: 'accepted' });
     await store.incrementMonthlyUsage(user.id, month);
   } else {
     if (!db.dispatches[user.id]) db.dispatches[user.id] = {};
@@ -265,8 +280,8 @@ app.post('/api/v1/dispatch', authMiddleware, dispatchLimitMiddleware, async (req
   }
 
   res.json({
-    dispatchId, agentId, status: 'accepted',
-    source: source || 'api', timestamp: new Date().toISOString(), billable: true
+    dispatchId, agentId: sanitizedAgentId, status: 'accepted',
+    source: sanitizedSource, timestamp: new Date().toISOString(), billable: true
   });
 });
 
@@ -287,14 +302,18 @@ app.post('/api/v1/agents', authMiddleware, async (req, res) => {
 
   const { name, endpoint, model, systemPrompt } = req.body;
   if (!name || !endpoint) return res.status(400).json({ error: 'name and endpoint required' });
+  const sanitizedName = String(name).slice(0, 255);
+  const sanitizedEndpoint = String(endpoint).slice(0, 2048);
+  const sanitizedModel = String(model || 'default').slice(0, 128);
+  const sanitizedPrompt = String(systemPrompt || '').slice(0, 50000);
 
   const agentId = 'agt_' + crypto.randomBytes(12).toString('hex');
 
   if (store) {
-    const agent = await store.createAgent({ id: agentId, userId: user.id, name, endpoint, model: model || 'default', systemPrompt: systemPrompt || '' });
+    const agent = await store.createAgent({ id: agentId, userId: user.id, name: sanitizedName, endpoint: sanitizedEndpoint, model: sanitizedModel, systemPrompt: sanitizedPrompt });
     res.status(201).json({ ...agent, status: 'idle' });
   } else {
-    const agent = { id: agentId, userId: user.id, name, endpoint, model: model || 'default', systemPrompt: systemPrompt || '', status: 'idle', createdAt: new Date().toISOString() };
+    const agent = { id: agentId, userId: user.id, name: sanitizedName, endpoint: sanitizedEndpoint, model: sanitizedModel, systemPrompt: sanitizedPrompt, status: 'idle', createdAt: new Date().toISOString() };
     db.agents[agentId] = agent;
     res.status(201).json(agent);
   }
