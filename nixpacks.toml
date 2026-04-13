@@ -1,0 +1,11 @@
+[phases.setup]
+nPkgs = ["nodejs_20", "npm"]
+
+[phases.install]
+cmd = "npm ci"
+
+[phases.build]
+cmd = "echo 'Build complete'"
+
+[start]
+cmd = "node api/server.js"
