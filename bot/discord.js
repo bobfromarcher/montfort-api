@@ -9,7 +9,8 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.DirectMessages
   ]
 });
 
@@ -22,6 +23,36 @@ const scheduledTasks = new Map();
 const watchKeywords = new Map();
 
 const INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1067608639877161031&permissions=562952101021760&integration_type=0&scope=bot+applications.commands';
+
+const C = {
+  amber: 0xc9a227,
+  amberLight: 0xe2c064,
+  cream: 0xf5f0e8,
+  sage: 0x7ab87a,
+  coral: 0xd4553a,
+  slate: 0x6b7c94,
+  lavender: 0x9b8ec4,
+  surface: 0x1c1c22,
+  bg: 0x0c0c0e
+};
+
+const BRAND = 'Montfort';
+
+function sanitize(str) {
+  return String(str).replace(/[@<>#[\]]/g, '').slice(0, 2000);
+}
+
+const cooldowns = new Map();
+const COOLDOWN_MS = 3000;
+
+function checkCooldown(userId, cmd) {
+  const key = `${userId}:${cmd}`;
+  const now = Date.now();
+  const last = cooldowns.get(key) || 0;
+  if (now - last < COOLDOWN_MS) return false;
+  cooldowns.set(key, now);
+  return true;
+}
 
 const activeTrivia = new Map();
 const activePolls = new Map();
@@ -414,7 +445,7 @@ setInterval(async () => {
       const embed = new EmbedBuilder()
         .setTitle(`${agent.name} — Scheduled`)
         .setDescription(response.slice(0, 4096))
-        .setColor(0xb8860b)
+        .setColor(C.amber)
         .setFooter({ text: `Scheduled task: ${task.label}` })
         .setTimestamp();
 
@@ -544,8 +575,8 @@ client.on('guildCreate', async (guild) => {
         '**Share me!** `m!invite` to add me to other servers\n\n' +
         '`m!help` for all commands'
       )
-      .setColor(0x4ade80)
-      .setFooter({ text: 'I remember conversations. I learn your server over time.' })
+      .setColor(C.sage)
+      .setFooter({ text: `${BRAND} — I remember conversations. I learn your server over time.` })
       .setTimestamp();
     await channel.send({ embeds: [embed] });
   }
@@ -574,13 +605,13 @@ client.on('messageCreate', async (msg) => {
           await msg.reply({ embeds: [new EmbedBuilder()
             .setTitle('Correct!')
             .setDescription(`The answer is **${trivia.a}**. Well done, <@${msg.author.id}>!`)
-            .setColor(0x4ade80)
+            .setColor(C.sage)
           ]});
         } else {
           await msg.reply({ embeds: [new EmbedBuilder()
             .setTitle('Wrong!')
             .setDescription(`You said **${chosen}**, but the answer was **${trivia.a}**. Better luck next time!`)
-            .setColor(0xef4444)
+            .setColor(C.coral)
           ]});
         }
       }
@@ -615,8 +646,8 @@ client.on('messageCreate', async (msg) => {
             '\n\n**Memory**\n' + memLines.join('\n') +
             '\n\n**Account & Pro**\n' + acctLines.join('\n')
           )
-          .setColor(0xb8860b)
-          .setFooter({ text: 'Fun commands work instantly! Deploy agents for AI chat.' })
+          .setColor(C.amber)
+          .setFooter({ text: `${BRAND} — Fun commands work instantly! Deploy agents for AI chat.` })
         ]});
         return;
       }
@@ -626,7 +657,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Agent Templates')
           .setDescription('Deploy with `m!deploy <name>`\n\n' + lines.join('\n'))
-          .setColor(0x4ade80)
+          .setColor(C.sage)
         ]});
         return;
       }
@@ -672,8 +703,8 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle(`${template.name} Deployed`)
           .setDescription(`Now active in this server. Mention me (@Montfort) to talk to your agents.\nI remember conversations in each channel.`)
-          .setColor(0x4ade80)
-          .addFields({ name: 'Template', value: templateName, inline: true }, { name: 'Agents', value: `${agents.length}/3 (free)`, inline: true })
+        .setColor(C.sage)
+        .addFields({ name: 'Template', value: templateName, inline: true }, { name: 'Agents', value: `${agents.length}/3 (free)`, inline: true })
         ]});
         return;
       }
@@ -688,7 +719,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Your Agents')
           .setDescription(lines.join('\n'))
-          .setColor(0xb8860b)
+          .setColor(C.amber)
         ]});
         return;
       }
@@ -722,7 +753,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Account Connected')
           .setDescription(`Plan: **${result.planName}**\nTasks: ${result.dispatchesUsed}/${result.dispatchesLimit}\nAgents: ${result.agentsUsed}/${result.agentsLimit}`)
-          .setColor(0x4ade80)
+          .setColor(C.sage)
         ]});
         return;
       }
@@ -745,7 +776,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Usage')
           .setDescription(`Plan: **${result.planName}**\nTasks: ${result.dispatchesUsed}/${result.dispatchesLimit}\nAgents: ${result.agentsUsed}/${result.agentsLimit}`)
-          .setColor(0xb8860b)
+          .setColor(C.amber)
         ]});
         return;
       }
@@ -772,7 +803,7 @@ client.on('messageCreate', async (msg) => {
       }
 
       case 'remember': {
-        const text = args.join(' ');
+        const text = sanitize(args.join(' '));
         if (!text) {
           await msg.reply('Usage: `m!remember Our team uses Jira for project tracking`');
           return;
@@ -792,7 +823,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Server Knowledge')
           .setDescription(lines.join('\n'))
-          .setColor(0xb8860b)
+          .setColor(C.amber)
           .setFooter({ text: `${knowledge.length} facts stored` })
         ]});
         return;
@@ -807,7 +838,8 @@ client.on('messageCreate', async (msg) => {
       }
 
       case '8ball': {
-        const question = args.join(' ');
+        if (!checkCooldown(userId, '8ball')) { await msg.reply('Slow down! Try again in a moment.'); return; }
+        const question = sanitize(args.join(' '));
         if (!question) {
           await msg.reply('Ask a question! `m!8ball will I become famous?`');
           return;
@@ -816,12 +848,13 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Magic 8-Ball')
           .setDescription(`**Q:** ${question}\n\n🎱 **${answer}**`)
-          .setColor(0x1a1a2e)
+          .setColor(C.bg)
         ]});
         return;
       }
 
       case 'trivia': {
+        if (!checkCooldown(userId, 'trivia')) { await msg.reply('Slow down! Try again in a moment.'); return; }
         const existing = activeTrivia.get(channelId);
         if (existing) {
           await msg.reply(`A trivia question is active! Answer it first, or wait for it to expire.\n**Q:** ${existing.q}`);
@@ -835,7 +868,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Trivia')
           .setDescription(`**${t.q}**\n\n${optionText}\n\nType A, B, C, or D to answer! (30s)`)
-          .setColor(0x5865f2)
+          .setColor(C.slate)
         ]});
         setTimeout(() => { activeTrivia.delete(channelId); }, 30000);
         return;
@@ -846,13 +879,14 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Fun Fact')
           .setDescription(fact)
-          .setColor(0xfbbf24)
+          .setColor(C.amberLight)
           .setFooter({ text: 'm!fact for another one' })
         ]});
         return;
       }
 
       case 'roast': {
+        if (!checkCooldown(userId, 'roast')) { await msg.reply('Slow down! Try again in a moment.'); return; }
         const target = msg.mentions.users.first();
         const roast = FUN.roasts[Math.floor(Math.random() * FUN.roasts.length)];
         const text = target && target.id !== msg.author.id
@@ -861,7 +895,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Roast')
           .setDescription(text)
-          .setColor(0xef4444)
+          .setColor(C.coral)
           .setFooter({ text: 'All love, no hate' })
         ]});
         return;
@@ -876,7 +910,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Compliment')
           .setDescription(text)
-          .setColor(0x4ade80)
+          .setColor(C.sage)
         ]});
         return;
       }
@@ -886,7 +920,7 @@ client.on('messageCreate', async (msg) => {
         const pollMsg = await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Would You Rather')
           .setDescription(wyr)
-          .setColor(0xa78bfa)
+          .setColor(C.lavender)
           .setFooter({ text: 'React with your choice below' })
         ]});
         await pollMsg.react('🅰️');
@@ -895,7 +929,8 @@ client.on('messageCreate', async (msg) => {
       }
 
       case 'poll': {
-        const question = args.join(' ');
+        if (!checkCooldown(userId, 'poll')) { await msg.reply('Slow down! Try again in a moment.'); return; }
+        const question = sanitize(args.join(' '));
         if (!question) {
           await msg.reply('Ask something! `m!poll Should we play Valorant?`');
           return;
@@ -903,7 +938,7 @@ client.on('messageCreate', async (msg) => {
         const pollMsg = await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Poll')
           .setDescription(`**${question}**`)
-          .setColor(0x5865f2)
+          .setColor(C.slate)
           .setFooter({ text: 'React to vote' })
         ]});
         await pollMsg.react('👍');
@@ -928,7 +963,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle(`Define: ${word}`)
           .setDescription(definition.slice(0, 4096))
-          .setColor(0x38bdf8)
+          .setColor(C.amber)
         ]});
         return;
       }
@@ -955,7 +990,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Channel Summary')
           .setDescription(summary.slice(0, 4096))
-          .setColor(0xfbbf24)
+          .setColor(C.amberLight)
           .setFooter({ text: `${recent.length} messages summarized` })
         ]});
         return;
@@ -963,7 +998,7 @@ client.on('messageCreate', async (msg) => {
 
       case 'remind': {
         const timeStr = args[0];
-        const text = args.slice(1).join(' ');
+        const text = sanitize(args.slice(1).join(' '));
         if (!timeStr || !text) {
           await msg.reply('Usage: `m!remind 30m Take pizza out` (supports s/m/h, e.g. 10s, 30m, 2h)');
           return;
@@ -988,7 +1023,7 @@ client.on('messageCreate', async (msg) => {
             await ch.send({ embeds: [new EmbedBuilder()
               .setTitle('Reminder')
               .setDescription(`<@${userId}> ⏰ **${text}**`)
-              .setColor(0xf59e0b)
+              .setColor(C.amber)
             ]});
           }
         }, ms);
@@ -996,7 +1031,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Reminder Set')
           .setDescription(`I'll remind you in ${amount} ${unitLabel}${amount > 1 ? 's' : ''}: **${text}**`)
-          .setColor(0x4ade80)
+          .setColor(C.sage)
         ]});
         return;
       }
@@ -1005,7 +1040,7 @@ client.on('messageCreate', async (msg) => {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Add Montfort to Your Server')
           .setDescription(`Click to invite:\n${INVITE_URL}\n\nWorks instantly — no setup needed. Try m!8ball, m!trivia, m!fact right away!`)
-          .setColor(0x4ade80)
+          .setColor(C.sage)
           .setFooter({ text: 'Share this link with friends!' })
         ]});
         return;
@@ -1032,8 +1067,40 @@ client.on('messageCreate', async (msg) => {
             `**Facts remembered:** ${totalFacts}\n\n` +
             `[Add to your server](${INVITE_URL})`
           )
-          .setColor(0x5865f2)
+          .setColor(C.slate)
           .setFooter({ text: 'Growing every day' })
+        ]});
+        return;
+      }
+
+      case 'ask': {
+        const query = args.join(' ');
+        if (!query) {
+          await msg.reply('Ask something! `m!ask how do I deploy to AWS?`');
+          return;
+        }
+        const agents = serverAgents.get(guildId) || [];
+        if (agents.length === 0) {
+          await msg.reply('No agents deployed. Use `m!deploy <template>` first, or just @mention me!');
+          return;
+        }
+        await msg.channel.sendTyping();
+        const selectedAgent = pickBestAgent(agents, query) || agents[0];
+        pushChannelHistory(channelId, 'user', query, null);
+        const messages = buildContextMessages(guildId, channelId, selectedAgent.systemPrompt, query, authorTag, selectedAgent);
+        const apiKey = getApiKey(guildId);
+        const response = await callLLM(messages, apiKey);
+        selectedAgent.tasksCompleted++;
+        pushChannelHistory(channelId, 'assistant', response, selectedAgent.name);
+        if (apiKey) {
+          await apiRequest('/api/v1/dispatch', 'POST', { agentId: selectedAgent.id, prompt: query.slice(0, 2000), source: 'discord' }, apiKey).catch(() => {});
+        }
+        await msg.reply({ embeds: [new EmbedBuilder()
+          .setTitle(`${selectedAgent.name} (auto-routed)`)
+          .setDescription(response.slice(0, 4096))
+          .setColor(C.amber)
+          .setFooter({ text: `${BRAND} • Task #${selectedAgent.tasksCompleted} • Routed via m!ask` })
+          .setTimestamp()
         ]});
         return;
       }
@@ -1082,8 +1149,8 @@ client.on('messageCreate', async (msg) => {
     const embed = new EmbedBuilder()
       .setTitle(selectedAgent.name)
       .setDescription(response.slice(0, 4096))
-      .setColor(0x4ade80)
-      .setFooter({ text: `Montfort • Task #${selectedAgent.tasksCompleted} • I remember this conversation` })
+      .setColor(C.sage)
+      .setFooter({ text: `${BRAND} • Task #${selectedAgent.tasksCompleted} • I remember this conversation` })
       .setTimestamp();
 
     await msg.reply({ embeds: [embed] });
