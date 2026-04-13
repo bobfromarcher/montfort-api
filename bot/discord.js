@@ -84,15 +84,121 @@ const FUN = {
     "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid.",
     'There are more possible iterations of a game of chess than atoms in the observable universe.',
     'Wombat poop is cube-shaped.',
-    'A blue whale\'s heart is so big a small child could swim through its arteries.',
+    "A blue whale's heart is so big a small child could swim through its arteries.",
     'The unicorn is the national animal of Scotland.',
-    'An ostrich\'s eye is bigger than its brain.',
+    "An ostrich's eye is bigger than its brain.",
     'The first website ever created is still online: info.cern.ch.',
     'There are about 3.04 trillion trees on Earth — 422 for every person.',
     "The world's oldest known living tree is over 5,000 years old.",
     'Cows have best friends and get stressed when separated.',
     'A total solar eclipse happens somewhere on Earth roughly every 18 months.',
-    'The first computer bug was an actual bug — a moth found in a Harvard computer in 1947.'
+    'The first computer bug was an actual bug — a moth found in a Harvard computer in 1947.',
+    "Nintendo was founded in 1889 — they made playing cards, not video games.",
+    "The inventor of the Pringles can is buried in one.",
+    "A group of crows is called a murder.",
+    "Oxford University is older than the Aztec Empire. Teaching started in 1096; the Aztecs founded Tenochtitlan in 1325.",
+    "It rains diamonds on Jupiter and Saturn.",
+    "The Eiffel Tower can grow over 6 inches in summer due to heat expansion.",
+    "There are more stars in the universe than grains of sand on all of Earth's beaches.",
+    "Your stomach gets a new lining every 3-4 days to prevent it from digesting itself.",
+    "A bolt of lightning is five times hotter than the surface of the sun.",
+    "Koala fingerprints are so similar to human fingerprints that they've confused crime scene investigators.",
+    "The average person walks the equivalent of five times around the equator in their lifetime.",
+    "A single cloud can weigh over a million pounds.",
+    "Apples float because they're 25% air.",
+    "The human brain uses about 20% of the body's total energy, despite being only 2% of its mass.",
+    "There are roughly 4 pounds of bacteria in your body right now.",
+    "The Mona Lisa has no eyebrows. It was the fashion in Renaissance Florence.",
+    "The first YouTube video was uploaded on April 23, 2005 — it's called 'Me at the zoo'.",
+    "The average cumulus cloud weighs 1.1 million pounds.",
+    "Tardigrades can survive in the vacuum of space.",
+    "Vending machines kill more people each year than sharks do."
+  ],
+  wyr: [
+    'Would you rather have unlimited money or unlimited time?',
+    'Would you rather always be 10 minutes late or 20 minutes early?',
+    'Would you rather have internet that never goes down or a phone that never runs out of battery?',
+    'Would you rather be able to fly or be invisible?',
+    'Would you rather have rewind or pause on your life?',
+    'Would you rather know the date of your death or the cause?',
+    'Would you rather only be able to whisper or only be able to shout?',
+    'Would you rather have a personal chef or a personal trainer?',
+    'Would you rather live in the Matrix or the real world?',
+    'Would you rather never use social media again or never watch another movie?',
+    'Would you rather have a rewind button for your life or a pause button?',
+    'Would you rather fight one horse-sized duck or 100 duck-sized horses?',
+    'Would you rather always know when someone is lying or always get away with lying?',
+    'Would you rather have free WiFi wherever you go or free coffee wherever you go?',
+    'Would you rather be famous for something embarrassing or unknown but accomplished?',
+    'Would you rather give up all streaming services or all video games?',
+    'Would you rather only eat pizza or never eat pizza again?',
+    'Would you rather have a boring job that pays $500K or a fun job that pays $50K?',
+    'Would you rather have a rewind button for 24 hours or a fast-forward button for 24 hours?',
+    'Would you rather be the funniest person in the room or the smartest?',
+    'Would you rather always have to sing everything you say or dance everywhere you walk?',
+    'Would you rather have a third arm or a third leg?',
+    'Would you rather only be able to eat spicy food or only bland food for the rest of your life?',
+    'Would you rather have eyes that change color with your mood or hair that changes color with the weather?',
+    'Would you rather live in a world with no music or no color?',
+    'Would you rather have a personal theme song that plays everywhere you go or your own laugh track?',
+    'Would you rather be able to talk to animals or speak every human language?',
+    'Would you rather have no elbows or no knees?',
+    'Would you rather always feel like you need to sneeze but can\'t, or always feel like you have a pebble in your shoe?',
+    'Would you rather every dog you see aggressively bark at you or every cat you see aggressively hiss at you?'
+  ],
+  roasts: [
+    "You're like a cloud. When you disappear, it's a beautiful day.",
+    "I'd agree with you but then we'd both be wrong.",
+    "You bring everyone so much joy when you leave the room.",
+    "You're not stupid, you just have bad luck thinking.",
+    "I'm not saying you're dumb, but you could be outsmarted by a houseplant.",
+    "You have your whole life to be a menace. Why not take today off?",
+    "Your face is fine but your personality needs an update.",
+    "You're the reason the gene pool needs a lifeguard.",
+    "I'd roast you but it looks like life already beat me to it.",
+    "You're like the first slice of bread — everyone touches you but nobody wants you.",
+    "If you were any more boring you'd be a PowerPoint presentation.",
+    "You're not the dumbest person on Earth, but you better hope they don't die.",
+    "Somewhere out there, a village is missing its idiot.",
+    "You have the personality of a wet napkin.",
+    "I envy people who've never met you.",
+    "You're like a participation trophy — technically present, but nobody asked for you.",
+    "Your personality is like plain oatmeal. Room temperature plain oatmeal.",
+    "I'd explain why you're wrong but I don't have crayons on me.",
+    "You're the human equivalent of a typo — small, annoying, and everyone notices.",
+    "You talk a lot for someone with two ears and zero brain cells.",
+    "You're not worthless — you can always serve as a bad example.",
+    "I'm impressed. It takes real effort to be that consistently mediocre.",
+    "You have the charisma of a DMV line on a Monday.",
+    "Your hot take is more like a room-temperature take.",
+    "You're like a software update — nobody wants you and you always show up at the worst time."
+  ],
+  compliments: [
+    "You're the kind of person who makes the room better just by being in it.",
+    "Your energy is contagious in the best way.",
+    "You give off main character vibes.",
+    "You're smarter than you give yourself credit for.",
+    "The world is luckier because you're in it.",
+    "You have impeccable taste and it shows.",
+    "Your confidence inspires everyone around you.",
+    "You're proof that good people still exist.",
+    "You somehow make chaos look organized.",
+    "Your vibe is immaculate.",
+    "Everyone's day gets better when you show up.",
+    "You're the friend everyone wishes they had.",
+    "Your creativity is unmatched.",
+    "You carry yourself like someone who knows their worth.",
+    "You're a walking good idea.",
+    "You've got that rare combination of talent and humility.",
+    "You make difficult things look effortless.",
+    "Your laugh could power a small city.",
+    "You're the person people name-drop to sound interesting.",
+    "You walk in and the whole room pays attention — even if they don't realize it.",
+    "Your taste in music is always right and everyone knows it.",
+    "You're the reason group chats stay alive.",
+    "You have the kind of energy that makes people want to be around you.",
+    "You're not just cool — you're the standard.",
+    "Your comebacks are art. Give the Louvre a call."
   ],
   wyr: [
     'Would you rather have unlimited money or unlimited time?',
@@ -172,7 +278,30 @@ const FUN = {
     { q: "What is the most-used programming language as of 2024?", a: "Python", options: ["Java", "Python", "JavaScript", "C++"] },
     { q: "What does RAM stand for?", a: "Random Access Memory", options: ["Random Access Memory", "Read Access Module", "Rapid Application Memory", "Run Access Mode"] },
     { q: "Who is considered the father of the computer?", a: "Charles Babbage", options: ["Alan Turing", "Charles Babbage", "John von Neumann", "Ada Lovelace"] },
-    { q: "What does API stand for?", a: "Application Programming Interface", options: ["Application Programming Interface", "Advanced Protocol Integration", "Automated Process Instruction", "Application Process Integration"] }
+    { q: "What does API stand for?", a: "Application Programming Interface", options: ["Application Programming Interface", "Advanced Protocol Integration", "Automated Process Instruction", "Application Process Integration"] },
+    { q: "What is the most spoken language in the world?", a: "Mandarin Chinese", options: ["English", "Mandarin Chinese", "Spanish", "Hindi"] },
+    { q: "What is the largest desert in the world?", a: "Antarctic Desert", options: ["Sahara", "Antarctic Desert", "Arabian", "Gobi"] },
+    { q: "How many time zones does Russia span?", a: "11", options: ["7", "9", "11", "13"] },
+    { q: "What is the only metal that is liquid at room temperature?", a: "Mercury", options: ["Lead", "Mercury", "Gallium", "Cesium"] },
+    { q: "What year was the World Wide Web invented?", a: "1989", options: ["1985", "1989", "1991", "1993"] },
+    { q: "Which animal can sleep for 3 years?", a: "Snail", options: ["Koala", "Snail", "Sloth", "Bat"] },
+    { q: "What is the rarest blood type?", a: "AB negative", options: ["O negative", "AB negative", "B negative", "A negative"] },
+    { q: "How many bones does a shark have?", a: "0", options: ["0", "50", "120", "206"] },
+    { q: "What country has the most pyramids?", a: "Sudan", options: ["Egypt", "Sudan", "Mexico", "Peru"] },
+    { q: "What is the longest English word without a vowel?", a: "Rhythm", options: ["Myth", "Rhythm", "Nymph", "Shyly"] },
+    { q: "What is the smallest bone in the human body?", a: "Stapes", options: ["Stapes", "Femur", "Phalanx", "Coccyx"] },
+    { q: "What programming language was named after a snake?", a: "Python", options: ["Python", "Cobra", "Viper", "Mamba"] },
+    { q: "Which planet rotates on its side?", a: "Uranus", options: ["Neptune", "Uranus", "Saturn", "Venus"] },
+    { q: "What is the currency of Japan?", a: "Yen", options: ["Won", "Yen", "Yuan", "Ringgit"] },
+    { q: "How many hearts does an earthworm have?", a: "5", options: ["1", "3", "5", "10"] },
+    { q: "What is the boiling point of water in Celsius?", a: "100", options: ["90", "100", "110", "212"] },
+    { q: "What does DNS stand for?", a: "Domain Name System", options: ["Domain Name System", "Digital Network Service", "Data Node Structure", "Dynamic Naming System"] },
+    { q: "What is the largest muscle in the human body?", a: "Gluteus maximus", options: ["Gluteus maximus", "Quadriceps", "Pectoralis", "Latissimus dorsi"] },
+    { q: "What element does 'Fe' represent on the periodic table?", a: "Iron", options: ["Fluorine", "Iron", "Fermium", "Francium"] },
+    { q: "What year did the Berlin Wall fall?", a: "1989", options: ["1987", "1989", "1991", "1993"] },
+    { q: "What is the fastest land animal?", a: "Cheetah", options: ["Cheetah", "Lion", "Gazelle", "Pronghorn"] },
+    { q: "What does SQL stand for?", a: "Structured Query Language", options: ["Structured Query Language", "Simple Question Logic", "System Query Library", "Standard Query Logic"] },
+    { q: "Which organ produces insulin?", a: "Pancreas", options: ["Liver", "Pancreas", "Kidney", "Stomach"] }
   ]
 };
 
@@ -218,6 +347,9 @@ const COMMANDS_FUN = {
   'm!roast [@user]': 'Roast someone (or yourself)',
   'm!compliment [@user]': 'Brighten someone\'s day',
   'm!wyr': 'Would You Rather',
+  'm!rps <move>': 'Rock Paper Scissors (m!rps rock)',
+  'm!choose <a|b|c>': 'Can\'t decide? Let me pick (m!choose pizza|tacos|sushi)',
+  'm!guess': 'Number guessing game (1-100)',
   'm!poll <question>': 'Quick reaction poll',
   'm!define <word>': 'Get a definition',
   'm!summarize': 'Catch up on missed messages',
@@ -583,6 +715,7 @@ client.on('guildCreate', async (guild) => {
 });
 
 client.on('messageCreate', async (msg) => {
+  try {
   if (msg.author.bot) return;
 
   const isMention = msg.mentions.has(client.user);
@@ -1036,6 +1169,92 @@ client.on('messageCreate', async (msg) => {
         return;
       }
 
+      case 'rps': {
+        const move = args[0]?.toLowerCase();
+        const valid = ['rock', 'paper', 'scissors'];
+        if (!move || !valid.includes(move)) {
+          await msg.reply('Choose your weapon! `m!rps rock`, `m!rps paper`, or `m!rps scissors`');
+          return;
+        }
+        const botMove = valid[Math.floor(Math.random() * 3)];
+        const emojis = { rock: '\u{1FAA8}', paper: '\u{1F4C4}', scissors: '\u2702\uFE0F' };
+        let result;
+        if (move === botMove) result = 'Draw!';
+        else if (
+          (move === 'rock' && botMove === 'scissors') ||
+          (move === 'paper' && botMove === 'rock') ||
+          (move === 'scissors' && botMove === 'paper')
+        ) result = 'You win!';
+        else result = 'I win!';
+        await msg.reply({ embeds: [new EmbedBuilder()
+          .setTitle('Rock Paper Scissors')
+          .setDescription(`You: ${emojis[move]} ${move}\nMe: ${emojis[botMove]} ${botMove}\n\n**${result}**`)
+          .setColor(result === 'You win!' ? C.sage : result === 'I win!' ? C.coral : C.amber)
+        ]});
+        return;
+      }
+
+      case 'choose': {
+        const input = args.join(' ');
+        const choices = input.split('|').map(c => c.trim()).filter(c => c);
+        if (choices.length < 2) {
+          await msg.reply('Give me options separated by | — `m!choose pizza|tacos|sushi`');
+          return;
+        }
+        const chosen = choices[Math.floor(Math.random() * choices.length)];
+        await msg.reply({ embeds: [new EmbedBuilder()
+          .setTitle('The Oracle Has Spoken')
+          .setDescription(`Options: ${choices.join(', ')}\n\n**${chosen}**`)
+          .setColor(C.amber)
+          .setFooter({ text: `${BRAND} — The burden of choice is lifted` })
+        ]});
+        return;
+      }
+
+      case 'guess': {
+        const existing = activeTrivia.get('guess:' + channelId);
+        if (existing) {
+          const guess = parseInt(args[0]);
+          if (isNaN(guess) || guess < 1 || guess > 100) {
+            await msg.reply('Guess a number 1-100! Or wait for the round to expire.');
+            return;
+          }
+          const diff = Math.abs(guess - existing.number);
+          let hint;
+          if (guess === existing.number) {
+            activeTrivia.delete('guess:' + channelId);
+            await msg.reply({ embeds: [new EmbedBuilder()
+              .setTitle('You got it!')
+              .setDescription(`The number was **${existing.number}**! Took you ${existing.tries} tries.`)
+              .setColor(C.sage)
+            ]});
+            return;
+          } else if (diff <= 5) {
+            hint = guess > existing.number ? 'So close! Go lower.' : 'So close! Go higher.';
+          } else if (diff <= 15) {
+            hint = guess > existing.number ? 'Warm. Go lower.' : 'Warm. Go higher.';
+          } else {
+            hint = guess > existing.number ? 'Cold. Go lower.' : 'Cold. Go higher.';
+          }
+          existing.tries++;
+          await msg.reply({ embeds: [new EmbedBuilder()
+            .setTitle(`Guess #${existing.tries}`)
+            .setDescription(`You guessed **${guess}**. ${hint}`)
+            .setColor(C.amber)
+          ]});
+          return;
+        }
+        const number = Math.floor(Math.random() * 100) + 1;
+        activeTrivia.set('guess:' + channelId, { number, tries: 1 });
+        setTimeout(() => { activeTrivia.delete('guess:' + channelId); }, 60000);
+        await msg.reply({ embeds: [new EmbedBuilder()
+          .setTitle('Number Guessing Game')
+          .setDescription('I\'m thinking of a number between **1** and **100**.\nGuess with any number! I\'ll tell you higher or lower.\nType `m!guess <number>` to play. (60s)')
+          .setColor(C.lavender)
+        ]});
+        return;
+      }
+
       case 'invite': {
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Add Montfort to Your Server')
@@ -1155,6 +1374,10 @@ client.on('messageCreate', async (msg) => {
 
     await msg.reply({ embeds: [embed] });
   }
+  } catch (err) {
+    console.error('messageCreate error:', err.message);
+    try { await msg.reply('Something went wrong. Try again in a moment.').catch(() => {}); } catch {}
+  }
 });
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
@@ -1162,5 +1385,13 @@ if (!TOKEN) {
   console.error('DISCORD_BOT_TOKEN required');
   process.exit(1);
 }
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err.message);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection:', err?.message || err);
+});
 
 client.login(TOKEN);
