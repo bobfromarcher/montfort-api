@@ -200,60 +200,6 @@ const FUN = {
     "You're not just cool — you're the standard.",
     "Your comebacks are art. Give the Louvre a call."
   ],
-  wyr: [
-    'Would you rather have unlimited money or unlimited time?',
-    'Would you rather always be 10 minutes late or 20 minutes early?',
-    'Would you rather have internet that never goes down or a phone that never runs out of battery?',
-    'Would you rather be able to fly or be invisible?',
-    'Would you rather have rewind or pause on your life?',
-    'Would you rather know the date of your death or the cause?',
-    'Would you rather only be able to whisper or only be able to shout?',
-    'Would you rather have a personal chef or a personal trainer?',
-    'Would you rather live in the Matrix or the real world?',
-    'Would you rather never use social media again or never watch another movie?',
-    'Would you rather have a rewind button for your life or a pause button?',
-    'Would you rather fight one horse-sized duck or 100 duck-sized horses?',
-    'Would you rather always know when someone is lying or always get away with lying?',
-    'Would you rather have free WiFi wherever you go or free coffee wherever you go?',
-    'Would you rather be famous for something embarrassing or unknown but accomplished?',
-    'Would you rather give up all streaming services or all video games?',
-    'Would you rather only eat pizza or never eat pizza again?',
-    'Would you rather have a boring job that pays $500K or a fun job that pays $50K?'
-  ],
-  roasts: [
-    "You're like a cloud. When you disappear, it's a beautiful day.",
-    "I'd agree with you but then we'd both be wrong.",
-    "You bring everyone so much joy when you leave the room.",
-    "You're not stupid, you just have bad luck thinking.",
-    "I'm not saying you're dumb, but you could be outsmarted by a houseplant.",
-    "You have your whole life to be a menace. Why not take today off?",
-    "Your face is fine but your personality needs an update.",
-    "You're the reason the gene pool needs a lifeguard.",
-    "I'd roast you but it looks like life already beat me to it.",
-    "You're like the first slice of bread — everyone touches you but nobody wants you.",
-    "If you were any more boring you'd be a PowerPoint presentation.",
-    "You're not the dumbest person on Earth, but you better hope they don't die.",
-    "Somewhere out there, a village is missing its idiot.",
-    "You have the personality of a wet napkin.",
-    "I envy people who've never met you."
-  ],
-  compliments: [
-    "You're the kind of person who makes the room better just by being in it.",
-    "Your energy is contagious in the best way.",
-    "You give off main character vibes.",
-    "You're smarter than you give yourself credit for.",
-    "The world is luckier because you're in it.",
-    "You have impeccable taste and it shows.",
-    "Your confidence inspires everyone around you.",
-    "You're proof that good people still exist.",
-    "You somehow make chaos look organized.",
-    "Your vibe is immaculate.",
-    "Everyone's day gets better when you show up.",
-    "You're the friend everyone wishes they had.",
-    "Your creativity is unmatched.",
-    "You carry yourself like someone who knows their worth.",
-    "You're a walking good idea."
-  ],
   trivia: [
     { q: "What planet is known as the Red Planet?", a: "Mars", options: ["Venus", "Mars", "Jupiter", "Saturn"] },
     { q: "What is the largest ocean on Earth?", a: "Pacific", options: ["Atlantic", "Indian", "Pacific", "Arctic"] },
@@ -669,6 +615,9 @@ client.once('ready', async () => {
     for (const [chId, hist] of conversationHistory) {
       if (now - hist.lastActivity > HISTORY_EXPIRY_MS) conversationHistory.delete(chId);
     }
+    for (const [key, ts] of cooldowns) {
+      if (now - ts > 60000) cooldowns.delete(key);
+    }
   }, 30 * 60 * 1000);
 });
 
@@ -753,6 +702,17 @@ client.on('messageCreate', async (msg) => {
   }
 
   const content = msg.content.replace(/<@!?\d+>/g, '').replace(/^m!/, '').trim();
+  if (!msg.guild) {
+    if (isCommand && content.split(/\s+/)[0].toLowerCase() === 'help') {
+      await msg.reply('Montfort works best in a server! Add me with `m!invite` or use this link:\n' + INVITE_URL);
+      return;
+    }
+    if (isMention) {
+      await msg.reply('I work inside Discord servers. Add me to one and talk to me there!\n' + INVITE_URL);
+      return;
+    }
+    return;
+  }
   const guildId = msg.guild.id;
   const channelId = msg.channel.id;
   const authorTag = msg.author.tag;
@@ -964,7 +924,10 @@ client.on('messageCreate', async (msg) => {
 
       case 'reset': {
         serverAgents.delete(guildId);
-        conversationHistory.delete(channelId);
+        for (const [chId] of conversationHistory) {
+          const ch = client.channels.cache.get(chId);
+          if (ch && ch.guild?.id === guildId) conversationHistory.delete(chId);
+        }
         serverKnowledge.delete(guildId);
         await msg.reply('All agents, memory, and knowledge for this server have been reset.');
         return;
@@ -1081,7 +1044,7 @@ client.on('messageCreate', async (msg) => {
       }
 
       case 'define': {
-        const word = args[0];
+        const word = sanitize(args[0] || '');
         if (!word) {
           await msg.reply('What word? `m!define serendipity`');
           return;
@@ -1195,7 +1158,7 @@ client.on('messageCreate', async (msg) => {
       }
 
       case 'choose': {
-        const input = args.join(' ');
+        const input = sanitize(args.join(' '));
         const choices = input.split('|').map(c => c.trim()).filter(c => c);
         if (choices.length < 2) {
           await msg.reply('Give me options separated by | — `m!choose pizza|tacos|sushi`');
@@ -1223,9 +1186,10 @@ client.on('messageCreate', async (msg) => {
           let hint;
           if (guess === existing.number) {
             activeTrivia.delete('guess:' + channelId);
+            const tryWord = existing.tries === 1 ? 'try' : 'tries';
             await msg.reply({ embeds: [new EmbedBuilder()
               .setTitle('You got it!')
-              .setDescription(`The number was **${existing.number}**! Took you ${existing.tries} tries.`)
+              .setDescription(`The number was **${existing.number}**! Took you ${existing.tries} ${tryWord}.`)
               .setColor(C.sage)
             ]});
             return;
@@ -1245,7 +1209,7 @@ client.on('messageCreate', async (msg) => {
           return;
         }
         const number = Math.floor(Math.random() * 100) + 1;
-        activeTrivia.set('guess:' + channelId, { number, tries: 1 });
+        activeTrivia.set('guess:' + channelId, { number, tries: 0 });
         setTimeout(() => { activeTrivia.delete('guess:' + channelId); }, 60000);
         await msg.reply({ embeds: [new EmbedBuilder()
           .setTitle('Number Guessing Game')
