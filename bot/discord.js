@@ -21,7 +21,7 @@ const userProfiles = new Map();
 const scheduledTasks = new Map();
 const watchKeywords = new Map();
 
-const INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1067608639877161031&permissions=397284550656&scope=bot%20applications.commands';
+const INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1067608639877161031&permissions=562952101021760&integration_type=0&scope=bot+applications.commands';
 
 const activeTrivia = new Map();
 const activePolls = new Map();
